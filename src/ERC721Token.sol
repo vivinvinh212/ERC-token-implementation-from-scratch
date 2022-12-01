@@ -87,7 +87,6 @@ contract ERC721Token {
             _mint(_to, tokenId);
             emit tokenMinted(_to, tokenId);
         }
-        balances[_to] += _amount;
     }
 
     function burnToken(uint _tokenId) public onlyHolderOrApproved(_tokenId) {
@@ -121,8 +120,9 @@ contract ERC721Token {
     }
 
     function holderOf(uint _tokenId) public view returns (address) {
-        require(_exists(_tokenId), "ERC721: invalid token id");
-        return holders[_tokenId];
+        address holder = holders[_tokenId];
+        require(holder != address(0), "ERC721: invalid token id");
+        return holder;
     }
 
     function transfer(
@@ -179,13 +179,11 @@ contract ERC721Token {
 
     function _mint(address _to, uint _tokenId) internal {
         require(_to != address(0), "ERC721: mint to the zero address!");
-        require(!_exists(_tokenId), "ERC721: token already minted!");
+        // require(!_exists(_tokenId), "ERC721: token already minted!");
         unchecked {
             balances[_to] += 1;
         }
         holders[_tokenId] = _to;
-
-        emit Transfer(address(0), _to, _tokenId);
     }
 
     function _transfer(address _from, address _to, uint _tokenId) internal {

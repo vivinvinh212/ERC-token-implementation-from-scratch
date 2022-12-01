@@ -35,11 +35,16 @@ contract ERC20TOkenTest is Test {
         assertEq(erc20Token.allowance(account1, account2), 74);
     }
 
-    function testMintBalance() public {
+    function testMintBurnBalance() public {
         vm.startPrank(owner);
         erc20Token.mintToken(account1, 85);
         vm.stopPrank();
         assertEq(erc20Token.balanceOf(account1), 85);
+
+        vm.startPrank(account1);
+        erc20Token.burnToken(20);
+        vm.stopPrank();
+        assertEq(erc20Token.balanceOf(account1), 65);
     }
 
     function testOwner() public {

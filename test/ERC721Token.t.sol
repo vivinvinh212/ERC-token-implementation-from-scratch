@@ -28,6 +28,10 @@ contract ERC721TOkenTest is Test {
         assertEq(erc721Token.getSymbol(), "GLD");
     }
 
+    function testTotalSupply() public {
+        assertEq(erc721Token.totalSupply(), 100);
+    }
+
     // function testAllowance() public {
     //     vm.startPrank(account1);
     //     erc721Token.approve(account2, 0, 74);
@@ -35,15 +39,26 @@ contract ERC721TOkenTest is Test {
     //     assertEq(erc721Token.allowance(account1, account2), 74);
     // }
 
-    function testMintBalance() public {
+    function testFailEmptyMint() public {
         vm.startPrank(owner);
-        erc721Token.mintToken(account1, 85);
+        erc721Token.mintToken(account1, 0);
         vm.stopPrank();
-        assertEq(erc721Token.balanceOf(account1), 85);
     }
 
     function testOwner() public {
         assertEq(erc721Token.getOwner(), owner);
+    }
+
+    function testMintBurnBalance() public {
+        vm.startPrank(owner);
+        erc721Token.mintToken(account1, 2);
+        vm.stopPrank();
+        assertEq(erc721Token.balanceOf(account1), 3);
+
+        // vm.startPrank(account1);
+        // erc721Token.burnToken(20);
+        // vm.stopPrank();
+        // assertEq(erc721Token.balanceOf(account1), 65);
     }
 
     function testFailNotOwnerMint() public {
