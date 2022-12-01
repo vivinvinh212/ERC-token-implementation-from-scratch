@@ -32,13 +32,6 @@ contract ERC721TOkenTest is Test {
         assertEq(erc721Token.totalSupply(), 100);
     }
 
-    // function testAllowance() public {
-    //     vm.startPrank(account1);
-    //     erc721Token.approve(account2, 0, 74);
-    //     vm.stopPrank();
-    //     assertEq(erc721Token.allowance(account1, account2), 74);
-    // }
-
     function testFailEmptyMint() public {
         vm.startPrank(owner);
         erc721Token.mintToken(account1, 0);
@@ -53,52 +46,57 @@ contract ERC721TOkenTest is Test {
         vm.startPrank(owner);
         erc721Token.mintToken(account1, 2);
         vm.stopPrank();
-        assertEq(erc721Token.balanceOf(account1), 3);
+        assertEq(erc721Token.balanceOf(account1), 2);
+        assertEq(erc721Token.holderOf(1), account1);
+        assertEq(erc721Token.holderOf(2), account1);
+        assertEq(erc721Token.supply(), 2);
 
-        // vm.startPrank(account1);
-        // erc721Token.burnToken(20);
-        // vm.stopPrank();
-        // assertEq(erc721Token.balanceOf(account1), 65);
+        vm.startPrank(account1);
+        erc721Token.burnToken(1);
+        vm.stopPrank();
+        assertEq(erc721Token.balanceOf(account1), 1);
+        assertEq(erc721Token.holderOf(1), address(0));
+        assertEq(erc721Token.supply(), 1);
     }
 
     function testFailNotOwnerMint() public {
         erc721Token.mintToken(account1, 85);
     }
 
-    // function testTransfer() public {
-    //     vm.startPrank(owner);
-    //     erc721Token.mintToken(account1, 85);
-    //     vm.stopPrank();
+    function testTransfer() public {
+        vm.startPrank(owner);
+        erc721Token.mintToken(account1, 80);
+        vm.stopPrank();
 
-    //     vm.startPrank(account1);
-    //     erc721Token.transfer(account2, 74);
-    //     vm.stopPrank();
+        vm.startPrank(account1);
+        erc721Token.transfer(7, account2);
+        vm.stopPrank();
 
-    //     assertEq(erc721Token.balanceOf(account1), 11);
-    //     assertEq(erc721Token.balanceOf(account2), 74);
-    // }
+        assertEq(erc721Token.balanceOf(account1), 79);
+        assertEq(erc721Token.balanceOf(account2), 1);
+    }
 
-    // function testTransferFrom() public {
-    //     vm.startPrank(owner);
-    //     erc721Token.mintToken(account1, 85);
-    //     vm.stopPrank();
+    function testTransferFrom() public {
+        vm.startPrank(owner);
+        erc721Token.mintToken(account1, 85);
+        vm.stopPrank();
 
-    //     vm.startPrank(account1);
-    //     erc721Token.approve(account2, 0, 74);
-    //     vm.stopPrank();
+        vm.startPrank(account1);
+        erc721Token.approve(74, account2);
+        vm.stopPrank();
 
-    //     vm.startPrank(account2);
-    //     erc721Token.transferFrom(account1, account2, 74);
-    //     vm.stopPrank();
-    // }
+        vm.startPrank(account2);
+        erc721Token.transferFrom(account1, account2, 74);
+        vm.stopPrank();
+    }
 
-    // function testFailUnauthorizedTransferFrom() public {
-    //     vm.startPrank(owner);
-    //     erc721Token.mintToken(account1, 85);
-    //     vm.stopPrank();
+    function testFailUnauthorizedTransferFrom() public {
+        vm.startPrank(owner);
+        erc721Token.mintToken(account1, 85);
+        vm.stopPrank();
 
-    //     vm.startPrank(account2);
-    //     erc721Token.transferFrom(account1, account2, 74);
-    //     vm.stopPrank();
-    // }
+        vm.startPrank(account2);
+        erc721Token.transferFrom(account1, account2, 74);
+        vm.stopPrank();
+    }
 }

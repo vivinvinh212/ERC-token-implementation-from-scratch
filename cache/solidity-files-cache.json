@@ -967,8 +967,8 @@
       }
     },
     "src/ERC20Token.sol": {
-      "lastModificationDate": 1669745739563,
-      "contentHash": "3cfcd8f2c2ca8472fa57a9c4c4943fe4",
+      "lastModificationDate": 1669900030411,
+      "contentHash": "76979d40921b2cbccc3e74f8a415a39e",
       "sourceName": "src/ERC20Token.sol",
       "solcConfig": {
         "settings": {
@@ -1005,8 +1005,8 @@
       }
     },
     "src/ERC721Token.sol": {
-      "lastModificationDate": 1669886656315,
-      "contentHash": "9b2980e5c2641a03ca3575fdd2d64fb1",
+      "lastModificationDate": 1669900477255,
+      "contentHash": "4875fe3d86dc364db327f18087489059",
       "sourceName": "src/ERC721Token.sol",
       "solcConfig": {
         "settings": {
@@ -1045,8 +1045,8 @@
       }
     },
     "src/NFTMarketplace.sol": {
-      "lastModificationDate": 1669665652732,
-      "contentHash": "5247385d67ccb78b20d09bed05d67dda",
+      "lastModificationDate": 1669900749084,
+      "contentHash": "b8b43c73cd876b7329225ab9f45803b2",
       "sourceName": "src/NFTMarketplace.sol",
       "solcConfig": {
         "settings": {
@@ -1170,8 +1170,8 @@
       }
     },
     "test/ERC721Token.t.sol": {
-      "lastModificationDate": 1669888227261,
-      "contentHash": "9fb42f711f7bcf02ce8d74738dacc224",
+      "lastModificationDate": 1669890101038,
+      "contentHash": "1510eae00b7e6c771a179e9f3661819b",
       "sourceName": "test/ERC721Token.t.sol",
       "solcConfig": {
         "settings": {
@@ -1217,8 +1217,8 @@
       }
     },
     "test/NFTMarketplace.t.sol": {
-      "lastModificationDate": 1669751903064,
-      "contentHash": "d14fe7b063ee6084b6b24fd7d6344042",
+      "lastModificationDate": 1669899293595,
+      "contentHash": "f923add000da4b6891e7d14e10b78a3b",
       "sourceName": "test/NFTMarketplace.t.sol",
       "solcConfig": {
         "settings": {

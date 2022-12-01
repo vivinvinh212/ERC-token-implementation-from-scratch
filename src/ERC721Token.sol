@@ -14,30 +14,40 @@ contract ERC721Token {
     //NFT id counter
     Counters.Counter private _tokenIdCounter;
 
+    // Mapping keeping track of balances of addresses
     mapping(address => uint) private balances;
     // Mapping from token ID to owner address
     mapping(uint256 => address) private holders;
     // Mapping from token ID to approved address
     mapping(uint256 => address) private tokenApprovals;
-    mapping(uint256 => bool) private minted;
-    // Optional mapping for token URIs
+    // Mapping for token URIs
     mapping(uint256 => string) private tokenURIs;
 
+    // Main events including Mint, Burn, Transfer, Approve
     event tokenMinted(address _to, uint _tokenId);
     event tokenBurned(address _from, uint _tokenId);
     event Transfer(address _from, address _to, uint _tokenId);
     event Approval(address _from, address _to, uint _tokenId);
 
+    /**
+     * @dev Modifier restricting access to only owner
+     */
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner can call method");
         _;
     }
 
+    /**
+     * @dev Modifier restricting access to only holder
+     */
     modifier onlyHolder(uint _tokenId) {
         require(msg.sender == holders[_tokenId], "Only holder can call method");
         _;
     }
 
+    /**
+     * @dev Modifier restricting access to only holder or approved account
+     */
     modifier onlyHolderOrApproved(uint _tokenId) {
         require(
             msg.sender == tokenApprovals[_tokenId] ||
@@ -69,10 +79,16 @@ contract ERC721Token {
         return symbol;
     }
 
+    /**
+     * @dev Returns the owner of the token
+     */
     function getOwner() public view returns (address) {
         return owner;
     }
 
+    /**
+     * @dev Function allows the owner to issue new token to specified address.
+     */
     function mintToken(address _to, uint _amount) public onlyOwner {
         require(_amount > 0, "Must mint at least 1 NFT");
         require(_to != address(0), "ERC721: mint to the zero address");
@@ -81,7 +97,7 @@ contract ERC721Token {
             "Cannot mint more than total supply"
         );
         currentSupply += _amount;
-        for (uint256 i = 0; i <= _amount; i++) {
+        for (uint256 i = 0; i < _amount; i++) {
             _tokenIdCounter.increment();
             uint256 tokenId = _tokenIdCounter.current();
             _mint(_to, tokenId);
@@ -89,6 +105,9 @@ contract ERC721Token {
         }
     }
 
+    /**
+     * @dev Function allows anyone to burn an amount of their token.
+     */
     function burnToken(uint _tokenId) public onlyHolderOrApproved(_tokenId) {
         address holder = holders[_tokenId];
 
@@ -103,14 +122,23 @@ contract ERC721Token {
         emit tokenBurned(msg.sender, _tokenId);
     }
 
+    /**
+     * @dev Function returning to total supply defined by the owner in constructor.
+     */
     function totalSupply() public view returns (uint256) {
         return MAX_SUPPLY;
     }
 
+    /**
+     * @dev Function returning to current supply.
+     */
     function supply() public view returns (uint256) {
         return currentSupply;
     }
 
+    /**
+     * @dev Returns the balance of a specfific user.
+     */
     function balanceOf(address _user) public view returns (uint) {
         require(
             _user != address(0),
@@ -119,12 +147,17 @@ contract ERC721Token {
         return balances[_user];
     }
 
+    /**
+     * @dev Returns the holder of a specific token given token id.
+     */
     function holderOf(uint _tokenId) public view returns (address) {
         address holder = holders[_tokenId];
-        require(holder != address(0), "ERC721: invalid token id");
         return holder;
     }
 
+    /**
+     * @dev Allows user to transfer a specific token given token id to another address
+     */
     function transfer(
         uint _tokenId,
         address _to
@@ -133,15 +166,24 @@ contract ERC721Token {
         return true;
     }
 
+    /**
+     * @dev Allows an user to approve spending of a specific token for a spender account.
+     */
     function approve(uint _tokenId, address _to) public onlyHolder(_tokenId) {
         tokenApprovals[_tokenId] = _to;
         emit Approval(holderOf(_tokenId), _to, _tokenId);
     }
 
+    /**
+     * @dev View approval of a specific token.
+     */
     function getApproval(uint _tokenId) public view returns (address) {
         return tokenApprovals[_tokenId];
     }
 
+    /**
+     * @dev Allow an user to transfer token in behalf of the owner accounts given approval.
+     */
     function transferFrom(
         address _from,
         address _to,
@@ -151,6 +193,9 @@ contract ERC721Token {
         return true;
     }
 
+    /**
+     * @dev Return the tokenURI of a specific token.
+     */
     function tokenURI(uint256 _tokenId) public view returns (string memory) {
         require(_exists(_tokenId), "ERC721: invalid token id");
 
@@ -172,20 +217,29 @@ contract ERC721Token {
                 : "";
     }
 
+    /**
+     * @dev Set tokenURI for a token.
+     */
     function _setTokenURI(uint256 _tokenId, string memory _tokenURI) internal {
         require(_exists(_tokenId), "ERC721: URI set of nonexistent token");
         tokenURIs[_tokenId] = _tokenURI;
     }
 
+    /**
+     * @dev Internal function mint.
+     */
     function _mint(address _to, uint _tokenId) internal {
         require(_to != address(0), "ERC721: mint to the zero address!");
-        // require(!_exists(_tokenId), "ERC721: token already minted!");
+        require(!_exists(_tokenId), "ERC721: token already minted!");
         unchecked {
             balances[_to] += 1;
         }
         holders[_tokenId] = _to;
     }
 
+    /**
+     * @dev Internal function transfer.
+     */
     function _transfer(address _from, address _to, uint _tokenId) internal {
         require(
             _from == holders[_tokenId],
@@ -202,10 +256,16 @@ contract ERC721Token {
         holders[_tokenId] = _to;
     }
 
+    /**
+     * @dev Check the existence of token with the specified token id
+     */
     function _exists(uint256 _tokenId) internal view returns (bool) {
         return holderOf(_tokenId) != address(0);
     }
 
+    /**
+     * @dev Check if the address is the holder or is approved for a specific token id.
+     */
     function _isHolderOrApproved(
         address _spender,
         uint _tokenId

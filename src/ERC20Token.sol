@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-// Verified contract: https://goerli.etherscan.io/address/0xD9b9730d1792B64BF3ca2E5b2Ad1bDF7773C94Fd#code
-
 contract ERC20Token {
     address private owner;
     string private name;
@@ -10,19 +8,29 @@ contract ERC20Token {
     uint private immutable MAX_SUPPLY;
     uint currentSupply = 0;
 
+    // Mapping keeping track of balances of addresses
     mapping(address => uint) private balances;
+
+    // Mapping keeping track of allowances of addresses to other spenders
     mapping(address => mapping(address => uint256)) private allowed;
 
+    // Main events including Mint, Burn, Transfer, Approve
     event tokenMinted(address _to, uint _amount);
     event tokenBurned(address _from, uint _amount);
     event Transfer(address _from, address _to, uint _amount);
     event Approval(address _from, address _spender, uint _amount);
 
+    /**
+     * @dev Modifier restricting access to only owner
+     */
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner can call method");
         _;
     }
 
+    /**
+     * @dev Modifier requiring sufficient account balance compared to the specified amoount
+     */
     modifier insufficientBalance(address _from, uint _amount) {
         require(balances[_from] >= _amount, "Insufficient balance");
         _;
@@ -50,10 +58,16 @@ contract ERC20Token {
         return symbol;
     }
 
+    /**
+     * @dev Returns the owner of the token
+     */
     function getOwner() public view returns (address) {
         return owner;
     }
 
+    /**
+     * @dev Function allows the owner to issue new token to specified address.
+     */
     function mintToken(address _to, uint _amount) public onlyOwner {
         require(_to != address(0), "ERC20: mint to the zero address");
         require(
@@ -65,6 +79,9 @@ contract ERC20Token {
         emit tokenMinted(_to, _amount);
     }
 
+    /**
+     * @dev Function allows anyone to burn an amount of their token.
+     */
     function burnToken(
         uint _amount
     ) public insufficientBalance(msg.sender, _amount) {
@@ -73,10 +90,16 @@ contract ERC20Token {
         emit tokenBurned(msg.sender, _amount);
     }
 
+    /**
+     * @dev Function returning to total supply defined by the owner in constructor.
+     */
     function totalSupply() public view returns (uint256) {
         return MAX_SUPPLY;
     }
 
+    /**
+     * @dev Returns the balance of a specfific user.
+     */
     function balanceOf(address _user) public view returns (uint) {
         require(
             _user != address(0),
@@ -85,6 +108,9 @@ contract ERC20Token {
         return balances[_user];
     }
 
+    /**
+     * @dev Returns the allowance of an account for a spender.
+     */
     function allowance(
         address _owner,
         address _spender
@@ -92,6 +118,9 @@ contract ERC20Token {
         return allowed[_owner][_spender];
     }
 
+    /**
+     * @dev Allows user to transfer a specific amount of token to another address
+     */
     function transfer(
         address _to,
         uint _amount
@@ -103,6 +132,9 @@ contract ERC20Token {
         return true;
     }
 
+    /**
+     * @dev Allows an user to approve specific amount of spending for a spender account.
+     */
     function approve(
         address _spender,
         uint _oldAmount,
@@ -119,6 +151,9 @@ contract ERC20Token {
         return true;
     }
 
+    /**
+     * @dev Allow an user to transfer token in behalf of the owner accounts given approval.
+     */
     function transferFrom(
         address _from,
         address _to,

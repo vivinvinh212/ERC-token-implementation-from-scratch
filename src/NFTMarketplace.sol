@@ -4,15 +4,13 @@ pragma solidity ^0.8.2;
 import "./Counter.sol";
 import "./ERC721Token.sol";
 
-// https://goerli.etherscan.io/address/0x106578b5aF3C99446aa420840E7653e0D8feA727#code
-
 contract NFTMarketplace is ERC721Token {
     using Counters for Counters.Counter;
     //_tokenIds variable has the most recent minted tokenId
     Counters.Counter private _tokenIds;
     //Keeps track of the number of items sold on the marketplace
     Counters.Counter private _itemsSold;
-    //owner is the contract address that created the smart contract
+
     address payable owner;
     //The fee charged by the marketplace to be allowed to list an NFT
     uint256 listPrice = 0.01 ether;
@@ -41,6 +39,9 @@ contract NFTMarketplace is ERC721Token {
         owner = payable(msg.sender);
     }
 
+    /**
+     * @dev Mint new NFT for the specified tokenURI.
+     */
     function createToken(
         string memory _tokenURI,
         uint256 _price
@@ -54,6 +55,9 @@ contract NFTMarketplace is ERC721Token {
         return newTokenId;
     }
 
+    /**
+     * @dev Create listed token for NFT.
+     */
     function createListedToken(uint256 _tokenId, uint256 _price) private {
         //Make sure the sender sent enough ETH to pay for listing
         require(msg.value >= listPrice, "Not enough fee!");
@@ -83,6 +87,9 @@ contract NFTMarketplace is ERC721Token {
         );
     }
 
+    /**
+     * @dev Returns all listed NFTs.
+     */
     function getAllNFTs() public view returns (ListedToken[] memory) {
         uint currentId = getCurrentToken();
         ListedToken[] memory NFTs = new ListedToken[](currentId);
@@ -94,6 +101,9 @@ contract NFTMarketplace is ERC721Token {
         return NFTs;
     }
 
+    /**
+     * @dev Returns all listed NFTs of msg.sender.
+     */
     function getMyNFTs() public view returns (ListedToken[] memory) {
         uint totalItemCount = _tokenIds.current();
         uint itemCount = 0;
@@ -123,6 +133,9 @@ contract NFTMarketplace is ERC721Token {
         return NFTs;
     }
 
+    /**
+     * @dev Execute sale when transactions are made and transfer ownership.
+     */
     function executeSale(uint256 _tokenId) public payable {
         uint price = idToListedToken[_tokenId].price;
         address seller = idToListedToken[_tokenId].seller;
@@ -144,15 +157,24 @@ contract NFTMarketplace is ERC721Token {
         payable(seller).transfer(msg.value);
     }
 
+    /**
+     * @dev Allow owner to change listing fee.
+     */
     function updateListPrice(uint256 _listPrice) public payable {
         require(owner == msg.sender, "Only owner can update listing price");
         listPrice = _listPrice;
     }
 
+    /**
+     * @dev get listing fee.
+     */
     function getListPrice() public view returns (uint256) {
         return listPrice;
     }
 
+    /**
+     * @dev Get id of latest listed token.
+     */
     function getLatestIdToListedToken()
         public
         view
@@ -162,12 +184,18 @@ contract NFTMarketplace is ERC721Token {
         return idToListedToken[currentTokenId];
     }
 
+    /**
+     * @dev Get listed token of a specific token id.
+     */
     function getListedTokenForId(
         uint256 _tokenId
     ) public view returns (ListedToken memory) {
         return idToListedToken[_tokenId];
     }
 
+    /**
+     * @dev Get id of the current token counter.
+     */
     function getCurrentToken() public view returns (uint256) {
         return _tokenIds.current();
     }
